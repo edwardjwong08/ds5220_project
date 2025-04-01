@@ -2,7 +2,7 @@
 
 # contents
 
-#folders
+# folders
 
 Data:
 
@@ -15,3 +15,5 @@ ds 5220 project m2 wong.R - code done for milestone 2 for ej wong
 Figs:
 
 ds 5220 project corrplot.png - correlation plot of the predictors
+
+ds 5220 project m2 lasso plot - lasso optimization plot for the model
