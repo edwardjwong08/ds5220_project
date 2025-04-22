@@ -41,6 +41,8 @@ min_cross_entropy <- function(data,y) {
   best_split <- NA
   for (i in 1:ncol(data)) {
     x <- data[,i]
+    # Note it doesn't consider the entire range of data because it 
+    # may select a break point right at the boundary or after one point
     mesh <- seq(0.2,0.8,by=0.01)
     for (k in 1:length(mesh)) {
       s <- mesh[k]
