@@ -3,14 +3,17 @@
 c1 <- rgb(red=0,green=0.1,blue=0.9,alpha=0.3)
 c2 <- rgb(red=0.9,green=0,blue=0.05,alpha=0.5)
 
-headers = read.csv("default of credit card clients.csv", header = F, nrows = 1, as.is = T)
-default = read.csv("default of credit card clients.csv", skip = 2, header = F)
-headers[1] <- 'ID'
-colnames(default)= headers
+default <- read.csv("default of credit card clients.csv")
+default <- subset(default, select = -c(ID))
+
+#headers = read.csv("default of credit card clients.csv", header = F, nrows = 1, as.is = T)
+#default = read.csv("default of credit card clients.csv", skip = 2, header = F)
+#headers[1] <- 'ID'
+#colnames(default)= headers
 
 
 # Fit a general logistic model to predict Default using all variables
-model_fit <- glm(Y ~ ., data=default,family=binomial)
+model_fit <- glm(default.payment.next.month ~ ., data=default,family=binomial)
 print(summary(model_fit))
 
 
@@ -40,11 +43,11 @@ for(i in 1:K){
   trainData <- default.shuffled[-testIndexes, ]
 
 
-  fit.train = glm(Y ~ ., data=trainData,family=binomial)
+  fit.train = glm(default.payment.next.month ~ ., data=trainData,family=binomial)
   fit.pred = predict(fit.train, newdata=testData,family=binomial)
   fit.test <- rep(0,length(fit.pred))
   fit.test[fit.pred >= 0.5] <- 1
-  e <- sum(fit.test != testData$Y)/length(fit.test)
+  e <- sum(fit.test != testData$default.payment.next.month)/length(fit.test)
   error <- c(error,e)
 }
 
@@ -58,11 +61,11 @@ print(mean(error))
 
 default_plot <- default[1:1000,]
 
-plot(default_plot$X1,default_plot$X18, ylim = c(0,25000),xlim=c(0,5e5),
-     col=ifelse(default_plot$Y == 1,c2,c1),pch=19,cex=2,main='Credit Default for X1 and X18')
+plot(default_plot$LIMIT_BAL,default_plot$PAY_AMT1, ylim = c(0,25000),xlim=c(0,5e5),
+     col=ifelse(default_plot$default.payment.next.month == 1,c2,c1),pch=19,cex=2,main='Credit Default for Limit Balance and Payment Amount 1')
 
-plot(default_plot$X19,default_plot$X18, ylim = c(0,20000),xlim=c(0,20000),
+plot(default_plot$PAY_AMT2,default_plot$PAY_AMT1, ylim = c(0,20000),xlim=c(0,20000),
      col=ifelse(default_plot$Y == 1,c2,c1),pch=19,cex=2,main='Credit Default for X19 and X18')
 
-plot(default_plot$X12,default_plot$X1, ylim = c(0,5e5),xlim=c(0,20000),
+plot(default_plot$BILL_AMT1,default_plot$LIMIT_BAL, ylim = c(0,5e5),xlim=c(0,20000),
      col=ifelse(default_plot$Y == 1,c2,c1),pch=19,cex=2,main='Credit Default for X12 and X1')
