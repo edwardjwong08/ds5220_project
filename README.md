@@ -1,19 +1,20 @@
-# ds5220_project
+# DS 5220 Final Project
+### EJ Wong & Ryan Houseman 4/24/2025
 
-# contents
+## contents
+This repository contains code used to implement various machine learning techniques from DS5220 on the credit default data set.  
 
-# folders
+## folders
 
-Data:
-
+data:
 default+of+credit+card+clients.csv - csv of the dataset used, default of credit card clients (Source: https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients)
 
-Src/analysis:
+analysis:
+/legacy: contains old code for original implementation and testing
+* eda.R - contains code used for project EDA
+* ds 5220 project m2 final edit.R - code done for milestone 2 for logistic regression LASSO updates
+* logistic regression final.R - code for basic logistic regression model
+* decisionTree2.R - code for decision tree implementation
 
-ds 5220 project m2 wong.R - code done for milestone 2 for ej wong
+figs: contains various figures from eda and model outputs
 
-Figs:
-
-ds 5220 project corrplot.png - correlation plot of the predictors
-
-ds 5220 project m2 lasso plot - lasso optimization plot for the model
