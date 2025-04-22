@@ -2,7 +2,7 @@ library(tidyverse)
 library(corrplot)
 library(glmnet)
 
-#df <- read.csv("C:/Users/poibo/Downloads/default+of+credit+card+clients (1)/default of credit card clients.csv")
+#df <- read.csv("C:/Users/poibo/Downloads/default of credit card clients.xlsx - Data.csv")
 df <- read.csv("default of credit card clients.csv")
 
 X <- as.matrix(df[, 2:24])
@@ -57,6 +57,13 @@ folds <- cut(seq(1, nrow(df_shuffled)), breaks = K, labels = FALSE)
 
 error <- c()
 
+library(caret)
+
+accuracy_vec <- c()
+precision_vec <- c()
+recall_vec <- c()
+error_vec <- c()
+
 for (i in 1:K) {
   testIndexes <- which(folds == i, arr.ind = TRUE)
   testData <- df_shuffled[testIndexes, ]
@@ -66,9 +73,32 @@ for (i in 1:K) {
   fit_pred <- predict(fit_train, newdata = testData, type = "response")
   fit_test <- ifelse(fit_pred >= 0.5, 1, 0)
   
-  e <- mean(fit_test != testData$default.payment.next.month)
-  error <- c(error, e)
+  actual <- testData$default.payment.next.month
+  
+  cm <- table(Predicted = fit_test, Actual = actual)
+  
+  acc <- sum(diag(cm)) / sum(cm)
+  accuracy_vec <- c(accuracy_vec, acc)
+  
+  TP <- cm["1", "1"]
+  FP <- cm["1", "0"]
+  FN <- cm["0", "1"]
+  
+  precision <- ifelse((TP + FP) == 0, NA, TP / (TP + FP))
+  recall <- ifelse((TP + FN) == 0, NA, TP / (TP + FN))
+  
+  precision_vec <- c(precision_vec, precision)
+  recall_vec <- c(recall_vec, recall)
+  
+  e <- mean(fit_test != actual)
+  error_vec <- c(error_vec, e)
 }
+
+cat("\nMean Cross-Validation Metrics:\n")
+cat(sprintf("Error: %.4f\n", mean(error_vec)))
+cat(sprintf("Accuracy: %.4f\n", mean(accuracy_vec, na.rm = TRUE)))
+cat(sprintf("Precision: %.4f\n", mean(precision_vec, na.rm = TRUE)))
+cat(sprintf("Recall: %.4f\n", mean(recall_vec, na.rm = TRUE)))
 
 print('Mean of Cross Validation Error')
 print(mean(error))
@@ -83,3 +113,4 @@ print(best_lambda)
 #run lasso on optimal penalty value
 lasso.model <- glmnet(X, y, alpha = 1, lambda = best_lambda)
 print(coef(lasso.model))
+
