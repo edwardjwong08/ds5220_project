@@ -1,6 +1,6 @@
 # Load data
 #set the directory to where you have the datafile and change it accordingly
-df <- read.csv("default of credit card clients.xlsx - Data.csv")
+df <- read.csv("default of credit card clients.csv")
 df <- subset(df, select = -c(ID))
 
 #cross-entropy function (houseman)
