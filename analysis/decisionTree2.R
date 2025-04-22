@@ -1,6 +1,7 @@
 # Load data
 #set the directory to where you have the datafile and change it accordingly
-df <- read.csv("default of credit card clients.csv")
+df <- read.csv("default of credit card clients.xlsx - Data.csv")
+#df <- read.csv("C:/Users/poibo/Downloads/default of credit card clients.xlsx - Data.csv")
 df <- subset(df, select = -c(ID))
 
 #cross-entropy function (houseman)
@@ -86,8 +87,64 @@ dt <- function(df, depth, tolerance = 0.01, used_features = c()) {
   return(list(prediction = prediction))
 }
 
+
 #example
 depth <- 3
 tree <- dt(df, depth = depth, tolerance = 1.0)
 print(tree)
 
+set.seed(8)
+
+sample <- sample(c(TRUE, FALSE), nrow(df), replace=TRUE, prob=c(0.7,0.3))
+train  <- df[sample, ]
+test   <- df[!sample, ]
+
+#predict and evaluate on test set
+predict_dt <- function(tree, sample) {
+  #pull prediction values if not null
+  if (!is.null(tree$prediction)) {
+    return(as.numeric(tree$prediction))
+  }
+  
+  #get the feature value counts
+  feature_value <- sample[[tree$feature]]
+  #return left and right splits accordingly
+  if (feature_value <= tree$split) {
+    return(predict_dt(tree$left, sample))
+  } else {
+    return(predict_dt(tree$right, sample))
+  }
+}
+
+tree_train <- dt(train, depth = 7, tolerance = 1.0)
+print(tree_train)
+
+tree_test <- dt(test, depth = 7, tolerance = 1.0)
+print(tree_test)
+
+#vectorized predictions
+test_predictions <- apply(test, 1, function(row) predict_dt(tree_train, as.list(row)))
+actual <- test[[ncol(test)]]
+
+#accuracy
+accuracy <- sum(test_predictions == actual) / length(actual)
+print(paste("Accuracy:", round(accuracy * 100, 2), "%"))
+
+#confusion Matrix
+conf_matrix <- table(Predicted = test_predictions, Actual = actual)
+print("Confusion Matrix:")
+print(conf_matrix)
+
+#precision recall and f1 scores
+precision <- conf_matrix[4]/(conf_matrix[4] + conf_matrix[3])
+recall <- conf_matrix[4]/(conf_matrix[4] + conf_matrix[2])
+f1 <- (2*precision*recall)/(precision+recall)
+
+print("Precision:")
+print(precision)
+
+print("Recall:")
+print(recall)
+
+print("F1:")
+print(f1)
